@@ -8,7 +8,8 @@ export default class Company extends Component {
     super()
     this.state = {
       users: [],
-      search: ''
+      search: '',
+      isFetching: false,
     }
   }
   shouldComponentUpdate(a, b, c) {
@@ -23,7 +24,7 @@ export default class Company extends Component {
       }
     }
     this.setState({ [key]: val })
-    axios.get(`http://192.168.43.132:4000/search?search=${this.state.search}`, config)
+    axios.get(`http://192.168.6.195:4000/search?search=${this.state.search}`, config)
       .then(result => {
         if (result.data.data == undefined) {
           this.setState({
@@ -39,7 +40,16 @@ export default class Company extends Component {
       })
       .catch(err => console.log(err))
   }
-  async componentDidMount() {
+  async UNSAFE_componentWillMount() {
+    this.mountAll()
+  }
+  onRefresh() {
+    this.setState({ isFetching: true }, function() { this.mountAll() });
+    setTimeout(() => {
+      this.setState({isFetching: false});
+    }, 2000);
+ }
+  mountAll =async()=>{
     const token = await AsyncStorage.getItem('token')
     const config = {
       headers: {
@@ -47,7 +57,7 @@ export default class Company extends Component {
       }
     }
 
-    axios.get('http://192.168.43.132:4000/engineer', config)
+    axios.get('http://192.168.6.195:4000/engineer', config)
       .then(result => {
         console.log(result.data, ':::::')
         this.setState({
@@ -60,12 +70,14 @@ export default class Company extends Component {
     return (
       <View>
         <TextInput
-          style={{ borderColor: 'red', height: 70, backgroundColor: 'pink', width: 360, fontSize: 18 }}
+          style={{ borderColor: 'red', height: 70, backgroundColor: 'transparent', width: 360, fontSize: 18 }}
           placeholder='Search...'
           onChangeText={val => this.onSearch('search', val)} />
         <FlatList
           data={this.state.users}
           showsVerticalScrollIndicator={false}
+          onRefresh={() => this.onRefresh()}
+          refreshing={this.state.isFetching}
           numColumns={2}
           renderItem={({ item }) =>
             <View style={{ padding: 5, marginLeft: 5 }}>
