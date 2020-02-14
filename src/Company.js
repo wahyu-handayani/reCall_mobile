@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { View, Text, TouchableOpacity, FlatList, Image, TextInput } from 'react-native'
-import { Card, CardItem, Body } from 'native-base'
+// import { Card, CardItem, Body } from 'native-base'
 import axios from 'axios'
+import MyCard from './Card'
 import AsyncStorage from '@react-native-community/async-storage';
 export default class Company extends Component {
   constructor() {
@@ -24,13 +25,13 @@ export default class Company extends Component {
       }
     }
     this.setState({ [key]: val })
-    axios.get(`http://192.168.6.195:4000/search?search=${this.state.search}`, config)
+    axios.get(`http://192.168.100.3:4000/search?search=${this.state.search}`, config)
       .then(result => {
         if (result.data.data == undefined) {
           this.setState({
             users: ''
           })
-        }else {
+        } else {
           this.setState({
             users: result.data.data
           })
@@ -44,12 +45,12 @@ export default class Company extends Component {
     this.mountAll()
   }
   onRefresh() {
-    this.setState({ isFetching: true }, function() { this.mountAll() });
+    this.setState({ isFetching: true }, function () { this.mountAll() });
     setTimeout(() => {
-      this.setState({isFetching: false});
+      this.setState({ isFetching: false });
     }, 2000);
- }
-  mountAll =async()=>{
+  }
+  mountAll = async () => {
     const token = await AsyncStorage.getItem('token')
     const config = {
       headers: {
@@ -57,7 +58,7 @@ export default class Company extends Component {
       }
     }
 
-    axios.get('http://192.168.6.195:4000/engineer', config)
+    axios.get('http://192.168.100.3:4000/engineer', config)
       .then(result => {
         console.log(result.data, ':::::')
         this.setState({
@@ -82,7 +83,7 @@ export default class Company extends Component {
           renderItem={({ item }) =>
             <View style={{ padding: 5, marginLeft: 5 }}>
               {console.log(item, 'lll')}
-              <Card style={{ borderRadius: 20, width: 160 }}>
+              {/* <Card style={{ borderRadius: 20, width: 160 }}>
                 <CardItem cardBody >
                   <Image source={require('./assets/user.png')} style={{ height: 170, width: 160, borderTopLeftRadius: 20, borderTopRightRadius: 20, borderWidth: 5 }} />
                 </CardItem>
@@ -92,7 +93,8 @@ export default class Company extends Component {
                     <Text>Skill: {item.skill}</Text>
                   </Body>
                 </CardItem>
-              </Card>
+              </Card> */}
+              <MyCard name={item.name} skill={item.skill}/>
             </View>
           }
           keyExtractor={item => item.email}
